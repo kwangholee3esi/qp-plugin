@@ -1,0 +1,911 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.quorumsoftware.com/qportfolio/scenario.schema.json",
+  "title": "QPortfolio Scenario Data",
+  "description": "Root document for a QPortfolio scenario file (qp_file_type = \u0022QPortfolio Scenario Data\u0022). A scenario is one \u0022what-if\u0022 case within a portfolio: its settings, optimization configuration, metric limits, the selected opportunities, and any selection rules overridden from the portfolio defaults. All opportunity and metric names must match those defined in the portfolio.",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "description": "Document header. For a scenario file qp_file_type must be \u0022QPortfolio Scenario Data\u0022.",
+      "type": "object",
+      "properties": {
+        "qp_file_type": {
+          "description": "Discriminator for the document kind. Use \u0022QPortfolio Data\u0022 for a portfolio-definition file (PortfolioData) and \u0022QPortfolio Scenario Data\u0022 for a scenario file (ScenarioData). Required.",
+          "type": "string"
+        },
+        "qp_version": {
+          "description": "QPortfolio schema/format version this file targets, e.g. 4.5. Optional; when omitted the importer assumes the current version.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "examples": [
+            4.5
+          ]
+        }
+      },
+      "required": [
+        "qp_file_type"
+      ],
+      "additionalProperties": false
+    },
+    "settings": {
+      "description": "Scenario identity and case settings (name, colour, data version, characteristics).",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "scenario_name": {
+          "description": "Unique, human-readable name of the scenario.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 450
+        },
+        "color": {
+          "description": "Display colour for the scenario as a hex string, e.g. \u0022#C25A38\u0022. Optional.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "maxLength": 32
+        },
+        "description": {
+          "description": "Free-text description of the scenario. Optional.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 1000
+        },
+        "instance_selection_threshold": {
+          "description": "Opportunity Instance Selection Threshold: the lowest fractional interest (between 0 and 1) counted as one instance when the opportunity is selected. Interests below it count as zero instances. Must be greater than the optimization feasibility_tolerance. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "enable_soft_constraints": {
+          "description": "When true, soft metric limits are allowed to be violated for a penalty in this scenario. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "data_version_name": {
+          "description": "Name of the data version this scenario loads for calculation/optimization (the input/master data set used).",
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 255
+        },
+        "characteristics": {
+          "description": "Scenario-level attribute/characteristic selections (e.g. a price set), driving sensitivity without changing opportunity inputs. Optional.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "description": "A single attribute/value pair, e.g. attribute = \u0022Country\u0022, value = \u0022Canada\u0022.",
+            "type": "object",
+            "properties": {
+              "attribute": {
+                "description": "The attribute (category) name.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 450
+              },
+              "value": {
+                "description": "The characteristic value for this attribute. Null/absent means unset.",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 450
+              }
+            },
+            "required": [
+              "attribute"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "scenario_name"
+      ],
+      "additionalProperties": false
+    },
+    "optimization": {
+      "description": "Optimization configuration: the objective metric and direction plus solver settings.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "direction": {
+          "description": "Whether to maximize or minimize the objective metric. Defaults to maximize. Allowed values: \u0060Maximize\u0060 \u2014 Maximize the objective metric (e.g. maximize NPV).; \u0060Minimize\u0060 \u2014 Minimize the objective metric (e.g. minimize spend)..",
+          "enum": [
+            "Maximize",
+            "Minimize"
+          ]
+        },
+        "objective_metric_name": {
+          "description": "Name of the metric to optimize (the objective function), e.g. an NPV metric.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 450
+        },
+        "objective_time_period": {
+          "description": "For a time-series objective, the period (time-step) up to which the metric is optimized. Optional for scalar objective metric.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "feasibility_tolerance": {
+          "description": "Feasibility tolerance: how strictly constraints must be honoured. Larger values can make a previously infeasible model solvable and solve faster. Default ~1E-7. Must be smaller than the instance_selection_threshold. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "optimality_tolerance": {
+          "description": "Optimality tolerance: tolerance on the nonlinear solver\u0027s rate-of-improvement test. Smaller values usually run longer but can yield better solutions. Default ~1E-4. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "optimality_gap_absolute": {
+          "description": "Absolute optimality gap: stop once the gap between the objective value and the best bound is within this absolute amount. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "optimality_gap_percentage": {
+          "description": "Relative optimality gap (percent): stop once the objective value is within this percentage of the best bound. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "penalty_weight": {
+          "description": "Overall scenario soft-constraints penalty weight applied across all soft metric limits. Optional.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "progress_interval": {
+          "description": "Solver progress check interval: how often optimization status is updated. Smaller values tend to increase solution time. Optional.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "timeout_minutes": {
+          "description": "Maximum minutes the solver may search. On timeout, an integer model returns the best integer solution found so far. Default 1. Optional.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "enforce_timeout": {
+          "description": "When true, forcibly stop all solver sub-problems at once on timeout (risking loss of feasible solutions) rather than letting each honour its own timeout. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "load_selections": {
+          "description": "When true, load the scenario\u0027s current selections as the solver\u0027s starting point to improve performance. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "use_linearization": {
+          "description": "When true, replace nonlinear operations with equivalent linear ones for performance (see linearization_level). Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "linearization_level": {
+          "description": "Which functions to linearize when use_linearization is true. Optional. Allowed values: \u0060SolverDecide\u0060 \u2014 Let the solver decide which functions to linearize.; \u0060AbsMinMax\u0060 \u2014 Linearize the ABS, MAX and MIN functions only.; \u0060All\u0060 \u2014 Linearize all supported functions..",
+          "enum": [
+            "SolverDecide",
+            "AbsMinMax",
+            "All",
+            null
+          ]
+        },
+        "use_local_solver": {
+          "description": "When true, use local solver(s) for a faster near-global result instead of the default global solver. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "max_local_solver": {
+          "description": "Number of local solvers to run (up to 100) when use_local_solver is true. Optional.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 100
+        },
+        "quadratic_xor_dependency": {
+          "description": "When true, model \u0027must not\u0027 selection dependencies with a quadratic expression (a*b = 0) instead of a Lindo Special Ordered Set; one form may solve faster depending on the model. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "strict_selection_threshold": {
+          "description": "When true, strictly enforce the instance_selection_threshold by overriding the feasibility tolerance. Can be performance-sensitive. Optional; defaults to false.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "solver_parameters": {
+          "description": "Expert Lindo solver parameters (id/value pairs). For advanced tuning; refer to Lindo documentation. Optional.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "description": "An expert Lindo solver parameter as an id/value pair.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Lindo parameter id.",
+                "type": "integer"
+              },
+              "value": {
+                "description": "Lindo parameter value.",
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metric_limits": {
+      "description": "Metric limits/targets the optimizer must honour for this scenario (per-metric, per-period).",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "description": "A limit or target placed on a metric\u0027s value (per period) that the optimizer must honour. A limit may be made soft to allow violation for a penalty.",
+        "type": "object",
+        "properties": {
+          "disabled": {
+            "description": "When true the limit is present but ignored by the optimizer. Optional; defaults to false.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "metric_name": {
+            "description": "Name of the metric being limited. Must match a model metric name.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 450
+          },
+          "limit_type": {
+            "description": "Whether targets are a minimum (lower bound) or maximum (upper bound). Allowed values: \u0060Minimum\u0060 \u2014 The metric value must be at least the target (lower bound).; \u0060Maximum\u0060 \u2014 The metric value must be at most the target (upper bound)..",
+            "enum": [
+              "Minimum",
+              "Maximum"
+            ]
+          },
+          "unit": {
+            "description": "Unit label for the targets, e.g. \u0022$ MM\u0022. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "targets": {
+            "description": "The per-period target values. Periods not listed are unconstrained for this metric.",
+            "type": "array",
+            "items": {
+              "description": "A single per-period target value for a metric limit.",
+              "type": "object",
+              "properties": {
+                "period": {
+                  "description": "Time period this target applies to (0-based).",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "value": {
+                  "description": "The target value the metric is bounded to in this period (interpreted as a minimum or maximum per the limit\u0027s limit_type).",
+                  "type": "number"
+                },
+                "disabled": {
+                  "description": "When true this period\u0027s target is present but ignored. Optional; defaults to false.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "soft": {
+            "description": "When true this limit may be violated for a penalty (a soft constraint) rather than being strictly enforced. Requires the scenario\u0027s enable_soft_constraints. Optional; defaults to false.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "magnitude": {
+            "description": "For a soft limit, the magnitude (scale of allowed violation) used in the penalty calculation. Optional; applies only when soft is true.",
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "penalty_weight": {
+            "description": "For a soft limit, the penalty weight applied to violations of this limit against the objective; higher weights make the limit \u0027harder\u0027. Optional; applies only when soft is true.",
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "metric_name"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueKeys": [
+        "/metric_name",
+        "/limit_type"
+      ]
+    },
+    "opportunity_selections": {
+      "description": "The selected quantity of each opportunity by period \u2014 the optimization result or a manually edited set of selections.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "description": "The selected quantity of one opportunity across periods.",
+        "type": "object",
+        "properties": {
+          "opportunity_name": {
+            "description": "Name of the selected opportunity. Must match a defined opportunity.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "selections": {
+            "description": "The per-period selection values. An empty list means the opportunity is not selected in any period.",
+            "type": "array",
+            "items": {
+              "description": "The selected quantity of an opportunity in a single period.",
+              "type": "object",
+              "properties": {
+                "period": {
+                  "description": "Time period of the selection (0-based).",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "value": {
+                  "description": "Selected quantity (interest) for this period. 1 = a full selection; a fraction (e.g. 0.5) = a partial selection where allowed; 0 = not selected.",
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "opportunity_name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "selection_constraints": {
+      "description": "Selection constraints overridden for this scenario if present(not null) (otherwise inherited from the portfolio).",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "opportunity_limits": {
+          "description": "The per-opportunity selection limits.",
+          "type": "array",
+          "items": {
+            "description": "Selection limits scoped to one named opportunity.",
+            "type": "object",
+            "properties": {
+              "opportunity_name": {
+                "description": "Unique name of the opportunity these limits apply to.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "disabled": {
+                "description": "When true the constraint is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "integer_only": {
+                "description": "When true the optimizer may only make whole (integer) selections of this unit \u2014 no partial/fractional selection. Integer selections increase solve time.",
+                "type": "boolean"
+              },
+              "interior_limit": {
+                "description": "Min Fraction: the minimum quantity that must be selected IF the unit is selected (it does not force selection). Applies per instance and only when non-integer selection is allowed; ignored when integer_only is true. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "total_minimum": {
+                "description": "Minimum total selection summed across the entire span of eligible periods (aggregate, not per period). A positive value forces selection.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_maximum": {
+                "description": "Maximum total selection summed across the entire span of eligible periods (aggregate, not per period). 0 forbids selection. Must be \u003E= total_minimum.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_instances_minimum": {
+                "description": "Minimum number of instances (each in-period selection counts as one instance regardless of fractional size; 1.1 counts as two). A positive value forces selection. Optional.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "total_instances_maximum": {
+                "description": "Maximum number of instances allowed. Optional. Must be \u003E= total_instances_minimum.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "time_period_minima": {
+                "description": "Per-period minimum selections, indexed by time period (element 0 = period 0). A positive entry forces selection in that period. May be empty (no per-period minima) or shorter than the horizon (unspecified periods are unbounded below).",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    0,
+                    0.001
+                  ]
+                ]
+              },
+              "time_period_maxima": {
+                "description": "Per-period maximum selections, indexed by time period (element 0 = period 0). Caps selection in that period (0 forbids it). May be empty (no per-period maxima). Where present, each entry must be \u003E= the matching time_period_minima.",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    4,
+                    4,
+                    4,
+                    4
+                  ]
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/opportunity_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection_dependency": {
+      "description": "Selection dependencies overridden for this scenario if present(not null) (otherwise inherited from the portfolio).",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "dependencies": {
+          "description": "The selection-dependency rules.",
+          "type": "array",
+          "items": {
+            "description": "One selection-dependency rule. Read as: for the dependent opportunity to be selected, the independent opportunity must/must-not be selected, starting timing_offset periods before/after/during the dependent\u0027s selected period, in the given quantity ratio.",
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "description": "When true the rule is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "dependent_opportunity": {
+                "description": "Name of the dependent opportunity \u2014 the one whose selection triggers the rule (\u0022to select X\u2026\u0022). X is the dependent.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "independent_opportunity": {
+                "description": "Name of the independent opportunity the dependent\u0027s selection depends on.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "type": {
+                "description": "Whether the independent opportunity must, or must not, be selected. Allowed values: \u0060Must\u0060 \u2014 The independent opportunity MUST be selected for the dependent to be selected.; \u0060MustNot\u0060 \u2014 The independent opportunity MUST NOT be selected when the dependent is selected (an exclusive either/or condition)..",
+                "enum": [
+                  "Must",
+                  "MustNot"
+                ]
+              },
+              "timing": {
+                "description": "Range direction of the timing relationship (over-all / before / after / during). Allowed values: \u0060OverAll\u0060 \u2014 The relationship applies across all periods (no directional timing).; \u0060Before\u0060 \u2014 The independent selection must occur before (inclusively) the dependent\u0027s period.; \u0060After\u0060 \u2014 The independent selection must occur after (inclusively) the dependent\u0027s period.; \u0060During\u0060 \u2014 The independent selection must occur during (the same period as) the dependent\u0027s period..",
+                "enum": [
+                  "OverAll",
+                  "Before",
+                  "After",
+                  "During"
+                ]
+              },
+              "timing_offset": {
+                "description": "Signed number of periods locating the start of the constrained range relative to the dependent\u0027s selected period: -1 = starts one period prior, 1 = starts one period after, 0 = same period. The sign only locates the start; it does not encode direction (that is the timing field).",
+                "type": "integer",
+                "examples": [
+                  -1
+                ]
+              },
+              "each_scale": {
+                "description": "Ratio scale on the dependent side (\u0027each\u0027 clause). With each_interest, expresses the dependent quantity in the \u0027N instances / R selections\u0027 ratio. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "each_interest": {
+                "description": "When true the \u0027each\u0027 ratio is expressed in real-number selections (R, interest); when false it is expressed in instance counts (N).",
+                "type": "boolean"
+              },
+              "need_scale": {
+                "description": "Ratio scale on the independent side (\u0027need\u0027 clause), paired with need_interest.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "need_interest": {
+                "description": "When true the \u0027need\u0027 ratio is expressed in real-number selections (R, interest); when false it is expressed in instance counts (N).",
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection_group": {
+      "description": "Selection groups overridden for this scenario if present(not null) (otherwise inherited from the portfolio).",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "groups": {
+          "description": "The selection groups and their members.",
+          "type": "array",
+          "items": {
+            "description": "One selection group: a named set of member opportunities linked by the group type.",
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "description": "When true the group is present but its linking behaviour is ignored (members fall back to their individual constraints). Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "group_name": {
+                "description": "Unique name of the group. Referenced by group_limits.group_name.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "type": {
+                "description": "Whether membership is mutually inclusive or mutually exclusive. Allowed values: \u0060MutualInclusive\u0060 \u2014 Mutually inclusive: all members are selected if any member is selected, in the same period as the independent opportunity.; \u0060MutualExclusive\u0060 \u2014 Mutually exclusive: only one member may be selected; the others are excluded and remain unavailable in later periods..",
+                "enum": [
+                  "MutualInclusive",
+                  "MutualExclusive"
+                ]
+              },
+              "members": {
+                "description": "The member opportunities of this group.",
+                "type": "array",
+                "items": {
+                  "description": "One member of a selection group.",
+                  "type": "object",
+                  "properties": {
+                    "opportunity_name": {
+                      "description": "Name of the member opportunity. Must match a defined opportunity.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "disabled": {
+                      "description": "When true this membership is removed from the group and the opportunity\u0027s own selection constraints re-apply. Optional; defaults to false.",
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "uniqueKeys": [
+                  "/opportunity_name"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/group_name"
+          ]
+        },
+        "group_limits": {
+          "description": "Group-level selection limits, one per group, keyed by group_name. While a group\u0027s limits are active they take precedence over members\u0027 individual selection constraints.",
+          "type": "array",
+          "items": {
+            "description": "Group-level selection limits applied to all members of one group. Inherits the same min/max/instance/per-period bounds as an opportunity limit; a group Max applies to each member (e.g. Max = 2 means each selected member may be selected up to twice), not to the count of members chosen.",
+            "type": "object",
+            "properties": {
+              "group_name": {
+                "description": "Name of the group these limits apply to. Must match a group\u0027s group_name.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "disabled": {
+                "description": "When true the constraint is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "integer_only": {
+                "description": "When true the optimizer may only make whole (integer) selections of this unit \u2014 no partial/fractional selection. Integer selections increase solve time.",
+                "type": "boolean"
+              },
+              "interior_limit": {
+                "description": "Min Fraction: the minimum quantity that must be selected IF the unit is selected (it does not force selection). Applies per instance and only when non-integer selection is allowed; ignored when integer_only is true. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "total_minimum": {
+                "description": "Minimum total selection summed across the entire span of eligible periods (aggregate, not per period). A positive value forces selection.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_maximum": {
+                "description": "Maximum total selection summed across the entire span of eligible periods (aggregate, not per period). 0 forbids selection. Must be \u003E= total_minimum.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_instances_minimum": {
+                "description": "Minimum number of instances (each in-period selection counts as one instance regardless of fractional size; 1.1 counts as two). A positive value forces selection. Optional.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "total_instances_maximum": {
+                "description": "Maximum number of instances allowed. Optional. Must be \u003E= total_instances_minimum.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "time_period_minima": {
+                "description": "Per-period minimum selections, indexed by time period (element 0 = period 0). A positive entry forces selection in that period. May be empty (no per-period minima) or shorter than the horizon (unspecified periods are unbounded below).",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    0,
+                    0.001
+                  ]
+                ]
+              },
+              "time_period_maxima": {
+                "description": "Per-period maximum selections, indexed by time period (element 0 = period 0). Caps selection in that period (0 forbids it). May be empty (no per-period maxima). Where present, each entry must be \u003E= the matching time_period_minima.",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    4,
+                    4,
+                    4,
+                    4
+                  ]
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/group_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "metadata": {
+        "qp_file_type": "QPortfolio Scenario Data",
+        "qp_version": 4.5
+      },
+      "settings": {
+        "scenario_name": "Base Case",
+        "color": "#C25A38",
+        "data_version_name": "V1",
+        "instance_selection_threshold": 0.001,
+        "enable_soft_constraints": false,
+        "characteristics": [
+          {
+            "attribute": "MD_Pricing",
+            "value": "CDN"
+          }
+        ]
+      },
+      "optimization": {
+        "direction": "Maximize",
+        "objective_metric_name": "NPV ($ MM)",
+        "objective_time_period": 10,
+        "use_linearization": true,
+        "linearization_level": "SolverDecide",
+        "timeout_minutes": 5
+      },
+      "metric_limits": [
+        {
+          "metric_name": "Capex-Drilling",
+          "limit_type": "Maximum",
+          "unit": "$ MM",
+          "targets": [
+            {
+              "period": 0,
+              "value": 1000
+            },
+            {
+              "period": 1,
+              "value": 2000
+            }
+          ]
+        }
+      ],
+      "opportunity_selections": [
+        {
+          "opportunity_name": "OPPORTUNITY 1",
+          "selections": [
+            {
+              "period": 0,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "selection_constraints": {
+        "opportunity_limits": [
+          {
+            "opportunity_name": "OPPORTUNITY 1",
+            "integer_only": false,
+            "total_minimum": 0,
+            "total_maximum": 1,
+            "time_period_minima": [],
+            "time_period_maxima": [
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "selection_dependency": {
+        "dependencies": [
+          {
+            "dependent_opportunity": "OPPORTUNITY 3",
+            "independent_opportunity": "OPPORTUNITY 2",
+            "type": "Must",
+            "timing": "Before",
+            "timing_offset": -1,
+            "each_scale": 2,
+            "each_interest": true,
+            "need_scale": 1,
+            "need_interest": true
+          }
+        ]
+      },
+      "selection_group": {
+        "groups": [
+          {
+            "group_name": "Group A",
+            "type": "MutualInclusive",
+            "members": [
+              {
+                "opportunity_name": "OPPORTUNITY 1"
+              }
+            ]
+          }
+        ],
+        "group_limits": [
+          {
+            "group_name": "Group A",
+            "integer_only": false,
+            "total_minimum": 0,
+            "total_maximum": 1,
+            "time_period_minima": [],
+            "time_period_maxima": []
+          }
+        ]
+      }
+    }
+  ]
+}

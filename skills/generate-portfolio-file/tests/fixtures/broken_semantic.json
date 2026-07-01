@@ -1,0 +1,51 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "input_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Alpha",
+        "outcomes": [
+          { "outcome_name": "P90", "weight": 0.4, "metric_values": [
+            { "metric_name": "Net cash flow", "values": [-10, 20, 30], "unit": "$ MM" } ] },
+          { "outcome_name": "P50", "weight": 0.5, "metric_values": [
+            { "metric_name": "Net cash flow", "values": [-10, 40, 60], "unit": "$ MM" } ] }
+        ]
+      }
+    ]
+  },
+  "outcome_dependency": {
+    "dependencies": [
+      {
+        "independent_opportunity": "Alpha",
+        "dependent_opportunity": "Alpha",
+        "target_cases": [
+          { "independent_outcomes": ["PXX"], "outcome_weights": [
+            { "dependent_outcomes": ["PYY"], "weight": 1 } ] }
+        ]
+      }
+    ]
+  },
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Alpha",
+        "integer_only": false,
+        "total_minimum": 5,
+        "total_maximum": 0,
+        "time_period_minima": [0, 3],
+        "time_period_maxima": [1, 1]
+      }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      {
+        "group_name": "G1",
+        "type": "MutualInclusive",
+        "members": [
+          { "opportunity_name": "Ghost" }
+        ]
+      }
+    ]
+  }
+}

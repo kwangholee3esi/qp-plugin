@@ -1,0 +1,192 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Scenario Data",
+    "qp_version": 4.5
+  },
+  "settings": {
+    "scenario_name": "Full Coverage Case",
+    "color": "#C25A38",
+    "description": "Kitchen-sink scenario exercising every scenario schema field.",
+    "instance_selection_threshold": 0.001,
+    "enable_soft_constraints": true,
+    "data_version_name": "V1",
+    "characteristics": [
+      { "attribute": "Country", "value": "Canada" }
+    ]
+  },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)",
+    "objective_time_period": 10,
+    "feasibility_tolerance": 1e-7,
+    "optimality_tolerance": 1e-4,
+    "optimality_gap_absolute": 0.5,
+    "optimality_gap_percentage": 1.0,
+    "penalty_weight": 100.0,
+    "progress_interval": 5,
+    "timeout_minutes": 5,
+    "enforce_timeout": false,
+    "load_selections": true,
+    "use_linearization": true,
+    "linearization_level": "SolverDecide",
+    "use_local_solver": true,
+    "max_local_solver": 5,
+    "quadratic_xor_dependency": false,
+    "strict_selection_threshold": false,
+    "solver_parameters": [
+      { "id": 1, "value": 0.0 },
+      { "id": 42, "value": 1.5 }
+    ]
+  },
+  "metric_limits": [
+    {
+      "disabled": false,
+      "metric_name": "Capex",
+      "limit_type": "Maximum",
+      "unit": "$ MM",
+      "targets": [
+        { "period": 0, "value": 1000.0, "disabled": false },
+        { "period": 1, "value": 2000.0 }
+      ],
+      "soft": true,
+      "magnitude": 50.0,
+      "penalty_weight": 10.0
+    },
+    {
+      "metric_name": "Oil Rate",
+      "limit_type": "Minimum",
+      "unit": "bbl/d",
+      "targets": [
+        { "period": 1, "value": 500.0 }
+      ]
+    }
+  ],
+  "opportunity_selections": [
+    {
+      "opportunity_name": "Well A",
+      "selections": [
+        { "period": 0, "value": 1.0 },
+        { "period": 1, "value": 0.5 }
+      ]
+    },
+    {
+      "opportunity_name": "Well B",
+      "selections": []
+    }
+  ],
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Well A",
+        "disabled": false,
+        "integer_only": false,
+        "interior_limit": 0.1,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "total_instances_minimum": 0,
+        "total_instances_maximum": 2,
+        "time_period_minima": [0, 0],
+        "time_period_maxima": [1, 1]
+      },
+      {
+        "opportunity_name": "Well B",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 2,
+        "time_period_minima": [],
+        "time_period_maxima": [1, 1, 1]
+      }
+    ]
+  },
+  "selection_dependency": {
+    "dependencies": [
+      {
+        "disabled": false,
+        "dependent_opportunity": "Well C",
+        "independent_opportunity": "Well A",
+        "type": "Must",
+        "timing": "OverAll",
+        "timing_offset": 0,
+        "each_scale": 2.0,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": true
+      },
+      {
+        "disabled": true,
+        "dependent_opportunity": "Well C",
+        "independent_opportunity": "Well E",
+        "type": "MustNot",
+        "timing": "Before",
+        "timing_offset": -1,
+        "each_scale": 1.5,
+        "each_interest": false,
+        "need_scale": 2.0,
+        "need_interest": false
+      },
+      {
+        "dependent_opportunity": "Well E",
+        "independent_opportunity": "Well A",
+        "type": "Must",
+        "timing": "After",
+        "timing_offset": 1,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": true
+      },
+      {
+        "dependent_opportunity": "Well E",
+        "independent_opportunity": "Well C",
+        "type": "Must",
+        "timing": "During",
+        "timing_offset": 0,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": false
+      }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      {
+        "disabled": false,
+        "group_name": "Group Inclusive",
+        "type": "MutualInclusive",
+        "members": [
+          { "opportunity_name": "Well A", "disabled": false },
+          { "opportunity_name": "Well B", "disabled": true }
+        ]
+      },
+      {
+        "group_name": "Group Exclusive",
+        "type": "MutualExclusive",
+        "members": [
+          { "opportunity_name": "Well C" },
+          { "opportunity_name": "Well D" }
+        ]
+      }
+    ],
+    "group_limits": [
+      {
+        "group_name": "Group Inclusive",
+        "disabled": false,
+        "integer_only": false,
+        "interior_limit": 0.2,
+        "total_minimum": 0,
+        "total_maximum": 2,
+        "total_instances_minimum": 0,
+        "total_instances_maximum": 2,
+        "time_period_minima": [0, 0],
+        "time_period_maxima": [2, 2]
+      },
+      {
+        "group_name": "Group Exclusive",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": [1]
+      }
+    ]
+  }
+}

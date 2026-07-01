@@ -1,0 +1,51 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": { "scenario_name": "Tied development" },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)"
+  },
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Wildcat Ridge",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": [1]
+      },
+      {
+        "opportunity_name": "Eastfield Infill",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": [1]
+      }
+    ]
+  },
+  "selection_dependency": {
+    "dependencies": [
+      {
+        "dependent_opportunity": "Eastfield Infill",
+        "independent_opportunity": "Wildcat Ridge",
+        "type": "Must",
+        "timing": "OverAll",
+        "timing_offset": 0
+      }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      {
+        "group_name": "Ridge cluster",
+        "type": "MutualInclusive",
+        "members": [
+          { "opportunity_name": "Wildcat Ridge" },
+          { "opportunity_name": "Eastfield Infill" }
+        ]
+      }
+    ]
+  }
+}

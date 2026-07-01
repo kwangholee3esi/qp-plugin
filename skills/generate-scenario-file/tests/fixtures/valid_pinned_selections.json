@@ -1,0 +1,34 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": {
+    "scenario_name": "Manual CDN-price case",
+    "enable_soft_constraints": true,
+    "characteristics": [ { "attribute": "MD_Pricing", "value": "CDN" } ]
+  },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)",
+    "penalty_weight": 1
+  },
+  "metric_limits": [
+    {
+      "metric_name": "Capex-Drilling",
+      "limit_type": "Maximum",
+      "unit": "$ MM",
+      "soft": true,
+      "magnitude": 10,
+      "penalty_weight": 5,
+      "targets": [ { "period": 0, "value": 50 } ]
+    }
+  ],
+  "opportunity_selections": [
+    {
+      "opportunity_name": "Wildcat Ridge",
+      "selections": [ { "period": 0, "value": 1 } ]
+    },
+    {
+      "opportunity_name": "Eastfield Infill",
+      "selections": []
+    }
+  ]
+}

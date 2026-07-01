@@ -1,0 +1,11 @@
+{
+  "name": "qp-portfolio-authoring",
+  "owner": { "name": "Quorum Portfolio" },
+  "plugins": [
+    {
+      "name": "qp-portfolio-authoring",
+      "source": ".",
+      "description": "Author & validate QPortfolio portfolio/scenario Portable-JSON files, with the QP domain vault connection bundled."
+    }
+  ]
+}

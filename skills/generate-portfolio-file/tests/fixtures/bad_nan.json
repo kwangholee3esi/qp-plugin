@@ -1,0 +1,1 @@
+{ "metadata": { "qp_file_type": "QPortfolio Data" }, "input_data": { "opportunity_outcomes": [ { "opportunity_name": "W", "outcomes": [ { "outcome_name": "Base", "metric_values": [ { "metric_name": "NCF", "values": [1, NaN, 3] } ] } ] } ] } }

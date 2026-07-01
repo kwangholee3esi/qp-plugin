@@ -1,0 +1,6 @@
+{
+  "name": "qp-portfolio-authoring",
+  "description": "Author and validate QPortfolio portfolio and scenario Portable-JSON files from plain-language descriptions, grounded in the QP domain vault.",
+  "author": { "name": "Quorum Portfolio" },
+  "repository": "https://github.com/kwangholee3esi/qp-plugin"
+}

@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Scenario Data"
+  },
+  "settings": {
+    "scenario_name": "Linearize All"
+  },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)",
+    "use_linearization": true,
+    "linearization_level": "All"
+  }
+}

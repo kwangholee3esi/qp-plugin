@@ -1,0 +1,835 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.quorumsoftware.com/qportfolio/portfolio.schema.json",
+  "title": "QPortfolio Portfolio Data",
+  "description": "Root document for a QPortfolio portfolio-definition file (qp_file_type = \u0022QPortfolio Data\u0022). A portfolio data is the opportunities plus their input data, master data, attributes and the rules/constraints that the optimizer later solves. All opportunity names referenced anywhere in this file must match the names defined in input_data exactly (names are the unique identifier for an opportunity).",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "description": "Document header. For a portfolio file qp_file_type must be \u0022QPortfolio Data\u0022.",
+      "type": "object",
+      "properties": {
+        "qp_file_type": {
+          "description": "Discriminator for the document kind. Use \u0022QPortfolio Data\u0022 for a portfolio-definition file (PortfolioData) and \u0022QPortfolio Scenario Data\u0022 for a scenario file (ScenarioData). Required.",
+          "type": "string"
+        },
+        "qp_version": {
+          "description": "QPortfolio schema/format version this file targets, e.g. 4.5. Optional; when omitted the importer assumes the current version.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "examples": [
+            4.5
+          ]
+        }
+      },
+      "required": [
+        "qp_file_type"
+      ],
+      "additionalProperties": false
+    },
+    "input_data": {
+      "description": "Per-opportunity opportunity input data: the time-series and scalar metric values (split into weighted outcomes for EV and Monte Carlo) that characterise each opportunity.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "opportunity_outcomes": {
+          "description": "The opportunities (or master-data sets) and their metric data. opportunity_name must be unique across the file.",
+          "type": "array",
+          "items": {
+            "description": "One opportunity (or master-data set) together with its weighted outcomes.",
+            "type": "object",
+            "properties": {
+              "opportunity_name": {
+                "description": "Unique name of the opportunity. Must match exactly everywhere this opportunity is referenced (constraints, dependencies, groups, selections).",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "outcomes": {
+                "description": "The weighted outcomes for this opportunity. A certain opportunity has a single outcome; an uncertain one is split into several weighted outcomes (e.g. P90/P50/P10) for Monte Carlo. The probability-weighted expected value is used in calculations, optimization and constraints.",
+                "type": "array",
+                "items": {
+                  "description": "A single weighted outcome of an opportunity and the metric values it carries.",
+                  "type": "object",
+                  "properties": {
+                    "outcome_name": {
+                      "description": "Name of this outcome, e.g. \u0022P90\u0022, \u0022P50\u0022, \u0022P10\u0022 or a single base case.",
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "weight": {
+                      "description": "Probability weight of this outcome within the opportunity. Weights across an opportunity\u0027s outcomes are normalised to form the expected value. Optional for single-outcome (certain) opportunities.",
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "metric_values": {
+                      "description": "The metric values for this outcome. Opportunities need not all populate the same set of metrics. For missing input metrics, all values default to 0.",
+                      "type": "array",
+                      "items": {
+                        "description": "The value of one metric for one outcome, either as a per-period time series or as a single scalar.",
+                        "type": "object",
+                        "properties": {
+                          "metric_name": {
+                            "description": "Name of the metric, e.g. \u0022Capex-Drilling\u0022. Must match the model\u0027s metric name.",
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 450
+                          },
+                          "values": {
+                            "description": "The metric values. When scalar is false/absent this is a time series indexed by time period (values[0] = period 0, values[1] = period 1, \u2026). When scalar is true the single value (values[0]) applies regardless of period.",
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "examples": [
+                              [
+                                120.5,
+                                98.2,
+                                0.0
+                              ]
+                            ]
+                          },
+                          "unit": {
+                            "description": "Unit label for display, e.g. \u0022$ MM\u0022, \u0022bbl/d\u0022. Optional.",
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "maxLength": 128
+                          },
+                          "scalar": {
+                            "description": "When true, this metric is a single scalar (constant in time) rather than a per-period time series. Optional; defaults to false (time series).",
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "metric_name",
+                          "values"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "uniqueKeys": [
+                        "/metric_name"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "outcome_name"
+                  ],
+                  "additionalProperties": false
+                },
+                "uniqueKeys": [
+                  "/outcome_name"
+                ]
+              }
+            },
+            "required": [
+              "opportunity_name"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/opportunity_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "master_data": {
+      "description": "Master data: array inputs that are constant period-to-period but may differ across periods and across sets (e.g. price decks, FX, inflation, fiscal parameters). Matched to opportunities/scenarios via attributes. A default set with no attributes must always exist.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "opportunity_outcomes": {
+          "description": "The opportunities (or master-data sets) and their metric data. opportunity_name must be unique across the file.",
+          "$ref": "#/properties/input_data/properties/opportunity_outcomes",
+          "uniqueKeys": [
+            "/opportunity_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "attributes": {
+      "description": "Attribute definitions and the per-opportunity characteristic values used to group, filter and match data (e.g. Country = Canada).",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "attributes": {
+          "description": "A set of attribute (category) names, e.g. [\u0022Country\u0022, \u0022Project Type\u0022]. Optional. When an opportunity\u0027s characteristics omit any of these names, its value is treated as unset (null). The sole purpose of this set is to minimize explicit null characteristic entries for each opportunity.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "opportunity_attributes": {
+          "description": "Per-opportunity attribute assignments and ordering.",
+          "type": "array",
+          "items": {
+            "description": "The characteristic values assigned to one opportunity, plus its ordering/offset.",
+            "type": "object",
+            "properties": {
+              "opportunity_name": {
+                "description": "Unique name of the opportunity these characteristics belong to.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "order": {
+                "description": "Display/sort order of the opportunity within the portfolio.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 999999
+              },
+              "offset": {
+                "description": "Optional start-period offset applied to this opportunity\u0027s data (number of periods its series was shifted). This value defines base selection. Omit for 0.",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "is_master_data": {
+                "description": "When true this row describes a master-data set rather than a selectable opportunity. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "characteristics": {
+                "description": "The attribute/value pairs assigned to this opportunity.",
+                "type": "array",
+                "items": {
+                  "description": "A single attribute/value pair, e.g. attribute = \u0022Country\u0022, value = \u0022Canada\u0022.",
+                  "type": "object",
+                  "properties": {
+                    "attribute": {
+                      "description": "The attribute (category) name.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 450
+                    },
+                    "value": {
+                      "description": "The characteristic value for this attribute. Null/absent means unset.",
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 450
+                    }
+                  },
+                  "required": [
+                    "attribute"
+                  ],
+                  "additionalProperties": false
+                },
+                "uniqueKeys": [
+                  "/attribute"
+                ]
+              }
+            },
+            "required": [
+              "opportunity_name"
+            ],
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/opportunity_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "outcome_dependency": {
+      "description": "Outcome dependencies: probabilistic correlations that reweight a dependent opportunity\u0027s outcomes based on the sampled outcome of an independent opportunity in each Monte Carlo trial. This is part of versioned data, not a rule which may vary per scenario.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "dependencies": {
+          "description": "The outcome-dependency rules.",
+          "type": "array",
+          "items": {
+            "description": "One outcome-dependency rule: how the dependent opportunity\u0027s outcome weights are reweighted given the independent opportunity\u0027s sampled outcome.",
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "description": "When true the rule is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "independent_opportunity": {
+                "description": "Name of the independent opportunity whose sampled outcome drives the rule.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "dependent_opportunity": {
+                "description": "Name of the dependent opportunity whose outcome weights are replaced.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "target_cases": {
+                "description": "The mapping cases: for each set of sampled independent outcomes, the replacement outcome weights to apply to the dependent opportunity.",
+                "type": "array",
+                "items": {
+                  "description": "One case of an outcome dependency: when the independent opportunity samples any of the listed outcomes, apply the given dependent outcome weights.",
+                  "type": "object",
+                  "properties": {
+                    "independent_outcomes": {
+                      "description": "The independent opportunity\u0027s outcome name(s) this case matches, e.g. [\u0022P90\u0022]. Use \u0022*\u0022 to match all independent outcomes not listed explicitly.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "outcome_weights": {
+                      "description": "The replacement weights to apply to the dependent opportunity\u0027s outcomes for this case.",
+                      "type": "array",
+                      "items": {
+                        "description": "A replacement weight for one (or more) of the dependent opportunity\u0027s outcomes.",
+                        "type": "object",
+                        "properties": {
+                          "dependent_outcomes": {
+                            "description": "The dependent opportunity\u0027s outcome name(s) this weight applies to, e.g. [\u0022P50\u0022].",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "weight": {
+                            "description": "The replacement probability weight to assign to those outcomes for this case.",
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection_constraints": {
+      "description": "Selection constraints: per-opportunity bounds on how many times and when an opportunity may be selected by the optimizer. This belongs to selection rules, and may vary per scenario.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "opportunity_limits": {
+          "description": "The per-opportunity selection limits.",
+          "type": "array",
+          "items": {
+            "description": "Selection limits scoped to one named opportunity.",
+            "type": "object",
+            "properties": {
+              "opportunity_name": {
+                "description": "Unique name of the opportunity these limits apply to.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "disabled": {
+                "description": "When true the constraint is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "integer_only": {
+                "description": "When true the optimizer may only make whole (integer) selections of this unit \u2014 no partial/fractional selection. Integer selections increase solve time.",
+                "type": "boolean"
+              },
+              "interior_limit": {
+                "description": "Min Fraction: the minimum quantity that must be selected IF the unit is selected (it does not force selection). Applies per instance and only when non-integer selection is allowed; ignored when integer_only is true. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "total_minimum": {
+                "description": "Minimum total selection summed across the entire span of eligible periods (aggregate, not per period). A positive value forces selection.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_maximum": {
+                "description": "Maximum total selection summed across the entire span of eligible periods (aggregate, not per period). 0 forbids selection. Must be \u003E= total_minimum.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_instances_minimum": {
+                "description": "Minimum number of instances (each in-period selection counts as one instance regardless of fractional size; 1.1 counts as two). A positive value forces selection. Optional.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "total_instances_maximum": {
+                "description": "Maximum number of instances allowed. Optional. Must be \u003E= total_instances_minimum.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "time_period_minima": {
+                "description": "Per-period minimum selections, indexed by time period (element 0 = period 0). A positive entry forces selection in that period. May be empty (no per-period minima) or shorter than the horizon (unspecified periods are unbounded below).",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    0,
+                    0.001
+                  ]
+                ]
+              },
+              "time_period_maxima": {
+                "description": "Per-period maximum selections, indexed by time period (element 0 = period 0). Caps selection in that period (0 forbids it). May be empty (no per-period maxima). Where present, each entry must be \u003E= the matching time_period_minima.",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    4,
+                    4,
+                    4,
+                    4
+                  ]
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/opportunity_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection_dependency": {
+      "description": "Selection dependencies: rules that change the select-ability of one (dependent) opportunity based on the selection of another (independent) one. This belongs to selection rules, and may vary per scenario.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "dependencies": {
+          "description": "The selection-dependency rules.",
+          "type": "array",
+          "items": {
+            "description": "One selection-dependency rule. Read as: for the dependent opportunity to be selected, the independent opportunity must/must-not be selected, starting timing_offset periods before/after/during the dependent\u0027s selected period, in the given quantity ratio.",
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "description": "When true the rule is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "dependent_opportunity": {
+                "description": "Name of the dependent opportunity \u2014 the one whose selection triggers the rule (\u0022to select X\u2026\u0022). X is the dependent.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "independent_opportunity": {
+                "description": "Name of the independent opportunity the dependent\u0027s selection depends on.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "type": {
+                "description": "Whether the independent opportunity must, or must not, be selected. Allowed values: \u0060Must\u0060 \u2014 The independent opportunity MUST be selected for the dependent to be selected.; \u0060MustNot\u0060 \u2014 The independent opportunity MUST NOT be selected when the dependent is selected (an exclusive either/or condition)..",
+                "enum": [
+                  "Must",
+                  "MustNot"
+                ]
+              },
+              "timing": {
+                "description": "Range direction of the timing relationship (over-all / before / after / during). Allowed values: \u0060OverAll\u0060 \u2014 The relationship applies across all periods (no directional timing).; \u0060Before\u0060 \u2014 The independent selection must occur before (inclusively) the dependent\u0027s period.; \u0060After\u0060 \u2014 The independent selection must occur after (inclusively) the dependent\u0027s period.; \u0060During\u0060 \u2014 The independent selection must occur during (the same period as) the dependent\u0027s period..",
+                "enum": [
+                  "OverAll",
+                  "Before",
+                  "After",
+                  "During"
+                ]
+              },
+              "timing_offset": {
+                "description": "Signed number of periods locating the start of the constrained range relative to the dependent\u0027s selected period: -1 = starts one period prior, 1 = starts one period after, 0 = same period. The sign only locates the start; it does not encode direction (that is the timing field).",
+                "type": "integer",
+                "examples": [
+                  -1
+                ]
+              },
+              "each_scale": {
+                "description": "Ratio scale on the dependent side (\u0027each\u0027 clause). With each_interest, expresses the dependent quantity in the \u0027N instances / R selections\u0027 ratio. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "each_interest": {
+                "description": "When true the \u0027each\u0027 ratio is expressed in real-number selections (R, interest); when false it is expressed in instance counts (N).",
+                "type": "boolean"
+              },
+              "need_scale": {
+                "description": "Ratio scale on the independent side (\u0027need\u0027 clause), paired with need_interest.",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "need_interest": {
+                "description": "When true the \u0027need\u0027 ratio is expressed in real-number selections (R, interest); when false it is expressed in instance counts (N).",
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection_group": {
+      "description": "Selection groups: containers that link the selection of opportunities (mutually inclusive or mutually exclusive), with group-level limits that override member constraints. This belongs to selection rules, and may vary per scenario.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "groups": {
+          "description": "The selection groups and their members.",
+          "type": "array",
+          "items": {
+            "description": "One selection group: a named set of member opportunities linked by the group type.",
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "description": "When true the group is present but its linking behaviour is ignored (members fall back to their individual constraints). Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "group_name": {
+                "description": "Unique name of the group. Referenced by group_limits.group_name.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "type": {
+                "description": "Whether membership is mutually inclusive or mutually exclusive. Allowed values: \u0060MutualInclusive\u0060 \u2014 Mutually inclusive: all members are selected if any member is selected, in the same period as the independent opportunity.; \u0060MutualExclusive\u0060 \u2014 Mutually exclusive: only one member may be selected; the others are excluded and remain unavailable in later periods..",
+                "enum": [
+                  "MutualInclusive",
+                  "MutualExclusive"
+                ]
+              },
+              "members": {
+                "description": "The member opportunities of this group.",
+                "type": "array",
+                "items": {
+                  "description": "One member of a selection group.",
+                  "type": "object",
+                  "properties": {
+                    "opportunity_name": {
+                      "description": "Name of the member opportunity. Must match a defined opportunity.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "disabled": {
+                      "description": "When true this membership is removed from the group and the opportunity\u0027s own selection constraints re-apply. Optional; defaults to false.",
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "uniqueKeys": [
+                  "/opportunity_name"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/group_name"
+          ]
+        },
+        "group_limits": {
+          "description": "Group-level selection limits, one per group, keyed by group_name. While a group\u0027s limits are active they take precedence over members\u0027 individual selection constraints.",
+          "type": "array",
+          "items": {
+            "description": "Group-level selection limits applied to all members of one group. Inherits the same min/max/instance/per-period bounds as an opportunity limit; a group Max applies to each member (e.g. Max = 2 means each selected member may be selected up to twice), not to the count of members chosen.",
+            "type": "object",
+            "properties": {
+              "group_name": {
+                "description": "Name of the group these limits apply to. Must match a group\u0027s group_name.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "disabled": {
+                "description": "When true the constraint is present but ignored. Optional; defaults to false.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "integer_only": {
+                "description": "When true the optimizer may only make whole (integer) selections of this unit \u2014 no partial/fractional selection. Integer selections increase solve time.",
+                "type": "boolean"
+              },
+              "interior_limit": {
+                "description": "Min Fraction: the minimum quantity that must be selected IF the unit is selected (it does not force selection). Applies per instance and only when non-integer selection is allowed; ignored when integer_only is true. Optional.",
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "total_minimum": {
+                "description": "Minimum total selection summed across the entire span of eligible periods (aggregate, not per period). A positive value forces selection.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_maximum": {
+                "description": "Maximum total selection summed across the entire span of eligible periods (aggregate, not per period). 0 forbids selection. Must be \u003E= total_minimum.",
+                "type": "number",
+                "minimum": 0
+              },
+              "total_instances_minimum": {
+                "description": "Minimum number of instances (each in-period selection counts as one instance regardless of fractional size; 1.1 counts as two). A positive value forces selection. Optional.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "total_instances_maximum": {
+                "description": "Maximum number of instances allowed. Optional. Must be \u003E= total_instances_minimum.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "time_period_minima": {
+                "description": "Per-period minimum selections, indexed by time period (element 0 = period 0). A positive entry forces selection in that period. May be empty (no per-period minima) or shorter than the horizon (unspecified periods are unbounded below).",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    0,
+                    0.001
+                  ]
+                ]
+              },
+              "time_period_maxima": {
+                "description": "Per-period maximum selections, indexed by time period (element 0 = period 0). Caps selection in that period (0 forbids it). May be empty (no per-period maxima). Where present, each entry must be \u003E= the matching time_period_minima.",
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "examples": [
+                  [
+                    4,
+                    4,
+                    4,
+                    4
+                  ]
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "uniqueKeys": [
+            "/group_name"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "metadata": {
+        "qp_file_type": "QPortfolio Data",
+        "qp_version": 4.5
+      },
+      "input_data": {
+        "opportunity_outcomes": [
+          {
+            "opportunity_name": "OPPORTUNITY 1",
+            "outcomes": [
+              {
+                "outcome_name": "P50",
+                "weight": 1.0,
+                "metric_values": [
+                  {
+                    "metric_name": "Capex-Drilling",
+                    "values": [
+                      120.5,
+                      98.2,
+                      0.0
+                    ],
+                    "unit": "$ MM"
+                  },
+                  {
+                    "metric_name": "Oil Rate",
+                    "values": [
+                      0.0,
+                      1500.0,
+                      1350.0
+                    ],
+                    "unit": "bbl/d"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "master_data": {
+        "opportunity_outcomes": [
+          {
+            "opportunity_name": "Default Prices",
+            "outcomes": [
+              {
+                "outcome_name": "Base",
+                "metric_values": [
+                  {
+                    "metric_name": "Oil Price",
+                    "values": [
+                      70.0,
+                      72.0,
+                      74.0
+                    ],
+                    "unit": "$/bbl"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "attributes": {
+        "attributes": [
+          "Country",
+          "Project Type"
+        ],
+        "opportunity_attributes": [
+          {
+            "opportunity_name": "OPPORTUNITY 1",
+            "order": 0,
+            "characteristics": [
+              {
+                "attribute": "Country",
+                "value": "Canada"
+              }
+            ]
+          }
+        ]
+      },
+      "outcome_dependency": {
+        "dependencies": [
+          {
+            "independent_opportunity": "OPPORTUNITY 1",
+            "dependent_opportunity": "OPPORTUNITY 2",
+            "target_cases": [
+              {
+                "independent_outcomes": [
+                  "P90"
+                ],
+                "outcome_weights": [
+                  {
+                    "dependent_outcomes": [
+                      "P90"
+                    ],
+                    "weight": 0.5
+                  },
+                  {
+                    "dependent_outcomes": [
+                      "P50"
+                    ],
+                    "weight": 0.3
+                  },
+                  {
+                    "dependent_outcomes": [
+                      "P10"
+                    ],
+                    "weight": 0.2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "selection_constraints": {
+        "opportunity_limits": [
+          {
+            "opportunity_name": "OPPORTUNITY 1",
+            "integer_only": false,
+            "total_minimum": 0,
+            "total_maximum": 1,
+            "time_period_minima": [],
+            "time_period_maxima": [
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

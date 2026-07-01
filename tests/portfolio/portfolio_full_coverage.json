@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Data",
+    "qp_version": 4.5
+  },
+  "input_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Well A",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": 1.0,
+            "metric_values": [
+              {
+                "metric_name": "Capex",
+                "values": [120.5, 98.2, 0.0],
+                "unit": "$ MM",
+                "scalar": false
+              },
+              {
+                "metric_name": "Oil Rate",
+                "values": [0.0, 1500.0, 1350.0],
+                "unit": "bbl/d",
+                "scalar": false
+              },
+              {
+                "metric_name": "Discount Rate",
+                "values": [0.1],
+                "unit": "fraction",
+                "scalar": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Well B",
+        "outcomes": [
+          {
+            "outcome_name": "P90",
+            "weight": 0.2,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [200.0, 150.0, 0.0], "unit": "$ MM" },
+              { "metric_name": "Oil Rate", "values": [0.0, 900.0, 820.0], "unit": "bbl/d" }
+            ]
+          },
+          {
+            "outcome_name": "P50",
+            "weight": 0.6,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [210.0, 160.0, 0.0], "unit": "$ MM" },
+              { "metric_name": "Oil Rate", "values": [0.0, 1200.0, 1100.0], "unit": "bbl/d" }
+            ]
+          },
+          {
+            "outcome_name": "P10",
+            "weight": 0.2,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [220.0, 170.0, 0.0], "unit": "$ MM" },
+              { "metric_name": "Oil Rate", "values": [0.0, 1700.0, 1550.0], "unit": "bbl/d" }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Well C",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": 1.0,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [80.0, 60.0, 0.0], "unit": "$ MM" }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Well D",
+        "outcomes": [
+          {
+            "outcome_name": "P90",
+            "weight": 0.3,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [90.0, 70.0, 0.0], "unit": "$ MM" }
+            ]
+          },
+          {
+            "outcome_name": "P50",
+            "weight": 0.4,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [95.0, 75.0, 0.0], "unit": "$ MM" }
+            ]
+          },
+          {
+            "outcome_name": "P10",
+            "weight": 0.3,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [100.0, 80.0, 0.0], "unit": "$ MM" }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Well E",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": 1.0,
+            "metric_values": [
+              { "metric_name": "Capex", "values": [55.0, 40.0, 0.0], "unit": "$ MM" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "master_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Default Prices",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "metric_values": [
+              { "metric_name": "Oil Price", "values": [70.0, 72.0, 74.0], "unit": "$/bbl", "scalar": false },
+              { "metric_name": "FX", "values": [1.3], "unit": "CAD/USD", "scalar": true }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Canada Prices",
+        "outcomes": [
+          {
+            "outcome_name": "High",
+            "weight": 0.5,
+            "metric_values": [
+              { "metric_name": "Oil Price", "values": [80.0, 84.0, 88.0], "unit": "$/bbl" }
+            ]
+          },
+          {
+            "outcome_name": "Low",
+            "weight": 0.5,
+            "metric_values": [
+              { "metric_name": "Oil Price", "values": [60.0, 62.0, 64.0], "unit": "$/bbl" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "attributes": {
+    "attributes": ["Country", "Project Type"],
+    "opportunity_attributes": [
+      {
+        "opportunity_name": "Well A",
+        "order": 0,
+        "offset": 0,
+        "is_master_data": false,
+        "characteristics": [
+          { "attribute": "Country", "value": "Canada" },
+          { "attribute": "Project Type", "value": "Exploration" }
+        ]
+      },
+      {
+        "opportunity_name": "Well B",
+        "order": 1,
+        "offset": 1,
+        "characteristics": [
+          { "attribute": "Country", "value": "Norway" }
+        ]
+      },
+      { "opportunity_name": "Well C", "order": 2 },
+      { "opportunity_name": "Well D", "order": 3 },
+      { "opportunity_name": "Well E", "order": 4 },
+      {
+        "opportunity_name": "Canada Prices",
+        "order": 5,
+        "is_master_data": true,
+        "characteristics": [
+          { "attribute": "Country", "value": "Canada" }
+        ]
+      }
+    ]
+  },
+  "outcome_dependency": {
+    "dependencies": [
+      {
+        "disabled": false,
+        "independent_opportunity": "Well B",
+        "dependent_opportunity": "Well D",
+        "target_cases": [
+          {
+            "independent_outcomes": ["P90"],
+            "outcome_weights": [
+              { "dependent_outcomes": ["P90"], "weight": 0.5 },
+              { "dependent_outcomes": ["P50"], "weight": 0.3 },
+              { "dependent_outcomes": ["P10"], "weight": 0.2 }
+            ]
+          },
+          {
+            "independent_outcomes": ["*"],
+            "outcome_weights": [
+              { "dependent_outcomes": ["P90", "P50"], "weight": 0.4 },
+              { "dependent_outcomes": ["P10"], "weight": 0.2 }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Well A",
+        "disabled": false,
+        "integer_only": false,
+        "interior_limit": 0.1,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "total_instances_minimum": 0,
+        "total_instances_maximum": 2,
+        "time_period_minima": [0, 0],
+        "time_period_maxima": [1, 1]
+      },
+      {
+        "opportunity_name": "Well B",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 2,
+        "time_period_minima": [],
+        "time_period_maxima": [1, 1, 1]
+      }
+    ]
+  },
+  "selection_dependency": {
+    "dependencies": [
+      {
+        "disabled": false,
+        "dependent_opportunity": "Well C",
+        "independent_opportunity": "Well A",
+        "type": "Must",
+        "timing": "OverAll",
+        "timing_offset": 0,
+        "each_scale": 2.0,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": true
+      },
+      {
+        "disabled": true,
+        "dependent_opportunity": "Well C",
+        "independent_opportunity": "Well E",
+        "type": "MustNot",
+        "timing": "Before",
+        "timing_offset": -1,
+        "each_scale": 1.5,
+        "each_interest": false,
+        "need_scale": 2.0,
+        "need_interest": false
+      },
+      {
+        "dependent_opportunity": "Well E",
+        "independent_opportunity": "Well A",
+        "type": "Must",
+        "timing": "After",
+        "timing_offset": 1,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": true
+      },
+      {
+        "dependent_opportunity": "Well E",
+        "independent_opportunity": "Well C",
+        "type": "Must",
+        "timing": "During",
+        "timing_offset": 0,
+        "each_interest": true,
+        "need_scale": 1.0,
+        "need_interest": false
+      }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      {
+        "disabled": false,
+        "group_name": "Group Inclusive",
+        "type": "MutualInclusive",
+        "members": [
+          { "opportunity_name": "Well A", "disabled": false },
+          { "opportunity_name": "Well B", "disabled": true }
+        ]
+      },
+      {
+        "group_name": "Group Exclusive",
+        "type": "MutualExclusive",
+        "members": [
+          { "opportunity_name": "Well C" },
+          { "opportunity_name": "Well D" }
+        ]
+      }
+    ],
+    "group_limits": [
+      {
+        "group_name": "Group Inclusive",
+        "disabled": false,
+        "integer_only": false,
+        "interior_limit": 0.2,
+        "total_minimum": 0,
+        "total_maximum": 2,
+        "total_instances_minimum": 0,
+        "total_instances_maximum": 2,
+        "time_period_minima": [0, 0],
+        "time_period_maxima": [2, 2]
+      },
+      {
+        "group_name": "Group Exclusive",
+        "integer_only": true,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": [1]
+      }
+    ]
+  }
+}

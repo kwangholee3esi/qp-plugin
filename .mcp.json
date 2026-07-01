@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "obsidian": { "type": "http", "url": "https://vm-pf-demo-001.planningspace.io/mcp" }
+  }
+}

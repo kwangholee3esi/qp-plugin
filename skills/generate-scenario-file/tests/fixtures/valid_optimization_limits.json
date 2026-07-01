@@ -1,0 +1,21 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": { "scenario_name": "Capex-capped plan", "description": "NPV max with $50MM/yr capex cap" },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)",
+    "objective_time_period": 10
+  },
+  "metric_limits": [
+    {
+      "metric_name": "Capex-Drilling",
+      "limit_type": "Maximum",
+      "unit": "$ MM",
+      "targets": [
+        { "period": 0, "value": 50 },
+        { "period": 1, "value": 50 },
+        { "period": 2, "value": 50 }
+      ]
+    }
+  ]
+}

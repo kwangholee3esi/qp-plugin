@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Data",
+    "qp_version": 4.5
+  },
+  "input_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": -0.5,
+            "metric_values": [
+              {
+                "metric_name": "Net cash flow",
+                "values": [
+                  1
+                ],
+                "scalar": true,
+                "unit": "$ MM"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Dup",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": 1,
+            "metric_values": [
+              {
+                "metric_name": "Net cash flow",
+                "values": [
+                  1
+                ],
+                "scalar": true,
+                "unit": "$ MM"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Dup",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "weight": 1,
+            "metric_values": [
+              {
+                "metric_name": "Net cash flow",
+                "values": [
+                  1
+                ],
+                "scalar": true,
+                "unit": "$ MM"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
