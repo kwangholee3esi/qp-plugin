@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "attributes": [
+    {
+      "attribute_name": "Project Type",
+      "data_type": "String",
+      "characteristics": [
+        { "characteristic_name": "Exploration", "sort_order": 1 },
+        { "characteristic_name": "Development", "sort_order": 2 }
+      ]
+    },
+    {
+      "attribute_name": "Start Year",
+      "data_type": "Date",
+      "editable": true,
+      "characteristics": []
+    }
+  ]
+}

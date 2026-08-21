@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Capex",
+      "unit": "$ MM"
+    },
+    {
+      "metric_name": "Capex Total",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "Total(${Capex})" }
+      ]
+    }
+  ]
+}

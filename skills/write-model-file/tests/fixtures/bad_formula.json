@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Prod",
+      "unit": "bbl/d"
+    },
+    {
+      "metric_name": "Bad Paren",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "(1 + ${Prod}" }
+      ]
+    },
+    {
+      "metric_name": "Bad Function",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "POWER(${Prod}, 2)" }
+      ]
+    },
+    {
+      "metric_name": "Bad Arity",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "Min(1, 2, 3) + Abs()" }
+      ]
+    },
+    {
+      "metric_name": "Bad Macro",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "FlagUpToMax(${Prod})" }
+      ]
+    },
+    {
+      "metric_name": "Bad Bare",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "Prod * 2" }
+      ]
+    }
+  ]
+}

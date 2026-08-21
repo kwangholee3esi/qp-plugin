@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Scenario Data"
+  },
+  "settings": {
+    "scenario_name": "Minimize Spend"
+  },
+  "optimization": {
+    "direction": "Minimize",
+    "objective_metric_name": "Capex",
+    "use_linearization": true,
+    "linearization_level": "AbsMinMax"
+  }
+}

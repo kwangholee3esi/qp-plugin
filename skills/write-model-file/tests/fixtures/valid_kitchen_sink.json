@@ -1,0 +1,149 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Oil Rate",
+      "unit": "bbl/d",
+      "category": "Inputs",
+      "description": "Produced oil rate per period."
+    },
+    {
+      "metric_name": "Opex - Fixed",
+      "unit": "$ MM",
+      "category": "Inputs"
+    },
+    {
+      "metric_name": "Opex - Variable",
+      "unit": "$ MM",
+      "category": "Inputs"
+    },
+    {
+      "metric_name": "Working Interest",
+      "scalar": true,
+      "unit": "fraction",
+      "category": "Inputs"
+    },
+    {
+      "metric_name": "Oil Price",
+      "metric_type": "MasterData",
+      "unit": "$/bbl",
+      "category": "Master Data"
+    },
+    {
+      "metric_name": "Reserves",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "MMbbl",
+      "expressions": [
+        {
+          "formula": "${Reserves} - ${Oil Rate}",
+          "first_period_formula": "1000"
+        }
+      ]
+    },
+    {
+      "metric_name": "Revenue",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "$ MM",
+      "color": "#1F77B4",
+      "format": "#,##0.0",
+      "derived": ["CumSum", "TotalDisc"],
+      "expressions": [
+        {
+          "order": 0,
+          "formula": "${Oil Rate} * ${Oil Price} / 1000"
+        },
+        {
+          "order": 1,
+          "formula": "${Oil Rate} * ${Oil Price} * 0.9 / 1000",
+          "criteria": [
+            { "attribute": "Country", "characteristic": ["USA"] }
+          ]
+        }
+      ]
+    },
+    {
+      "metric_name": "Revenue_interim_1",
+      "metric_type": "Computed",
+      "hidden": true,
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "Max(${Revenue#CumSum}, 0)" }
+      ]
+    },
+    {
+      "metric_name": "Operating Cost",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "$ MM",
+      "expressions": [
+        {
+          "order": 0,
+          "formula": "${Opex - Fixed} + ${Opex - Variable}"
+        },
+        {
+          "order": 1,
+          "formula": "0",
+          "criteria": [
+            { "outcome": ["Fail"], "except_outcome": false }
+          ]
+        }
+      ]
+    },
+    {
+      "metric_name": "Net Cashflow",
+      "metric_type": "Computed",
+      "level": "Opportunity",
+      "scale_by": "Instance",
+      "unit": "$ MM",
+      "expressions": [
+        {
+          "formula": "If(GetAttributeValue(${Country}) = \"Canada\", (${Revenue} - ${Operating Cost}) * 1.1, ${Revenue} - ${Operating Cost})"
+        }
+      ]
+    },
+    {
+      "metric_name": "Country Cashflow",
+      "metric_type": "Computed",
+      "level": "Group",
+      "group_by": ["Country"],
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "${Revenue} - ${Operating Cost}" }
+      ]
+    },
+    {
+      "metric_name": "Scenario Tax",
+      "metric_type": "Computed",
+      "level": "Scenario",
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "GetCumulative(${Revenue}, 0, GetCurrentTime()) * 0.3" }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "attribute_name": "Country",
+      "data_type": "String",
+      "editable": true,
+      "characteristics": [
+        { "characteristic_name": "Canada", "sort_order": 1, "color": "#1F77B4" },
+        { "characteristic_name": "USA", "sort_order": 2, "color": "#FF7F0E" }
+      ]
+    },
+    {
+      "attribute_name": "Price Set",
+      "data_type": "String",
+      "scenario_level": true,
+      "characteristics": [
+        { "characteristic_name": "High" },
+        { "characteristic_name": "Low" }
+      ]
+    }
+  ]
+}

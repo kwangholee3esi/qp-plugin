@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Capex",
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "1 + 1" }
+      ]
+    },
+    {
+      "metric_name": "NPV10",
+      "metric_type": "Computed",
+      "level": "Outcome"
+    },
+    {
+      "metric_name": "Revenue#CumSum",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "1" }
+      ]
+    },
+    {
+      "metric_name": "Cashflow",
+      "metric_type": "Computed",
+      "level": "Group",
+      "expressions": [
+        { "formula": "${Sales} - ${Missing#Total}" }
+      ]
+    },
+    {
+      "metric_name": "opex",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "expressions": [
+        { "formula": "2 * ${Capex}" }
+      ]
+    },
+    {
+      "metric_name": "Opex",
+      "unit": "$ MM"
+    },
+    {
+      "metric_name": " "
+    }
+  ]
+}

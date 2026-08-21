@@ -1,0 +1,38 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "input_data": {
+    "opportunity_outcomes": [
+      { "opportunity_name": "Field North", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Capex-Drilling", "values": [120, 80, 0], "unit": "$ MM" },
+          { "metric_name": "Oil production before royalties", "values": [0, 1.5, 1.35], "unit": "MMBOE" } ] } ] },
+      { "opportunity_name": "Field South", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Capex-Drilling", "values": [90, 60, 0], "unit": "$ MM" },
+          { "metric_name": "Oil production before royalties", "values": [0, 1.1, 1.0], "unit": "MMBOE" } ] } ] }
+    ]
+  },
+  "master_data": {
+    "opportunity_outcomes": [
+      { "opportunity_name": "Default Prices", "outcomes": [
+        { "outcome_name": "", "weight": 1, "metric_values": [
+          { "metric_name": "Oil Price", "values": [70, 72, 74], "unit": "$/bbl" } ] } ] }
+    ]
+  },
+  "attributes": {
+    "attributes": ["Country"],
+    "opportunity_attributes": [
+      { "opportunity_name": "Field North", "order": 0, "characteristics": [
+        { "attribute": "Country", "value": "Canada" } ] },
+      { "opportunity_name": "Field South", "order": 1, "characteristics": [
+        { "attribute": "Country", "value": "USA" } ] }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      { "group_name": "North+South", "type": "MutualInclusive", "members": [
+          { "opportunity_name": "Field North" },
+          { "opportunity_name": "Field South" } ] }
+    ]
+  }
+}

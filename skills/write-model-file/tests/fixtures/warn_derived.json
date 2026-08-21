@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Rate",
+      "unit": "bbl/d"
+    },
+    {
+      "metric_name": "Price",
+      "metric_type": "MasterData",
+      "unit": "$/bbl"
+    },
+    {
+      "metric_name": "Volume",
+      "scale_by": "Instance",
+      "unit": "MMbbl",
+      "derived": ["Total"]
+    },
+    {
+      "metric_name": "Peak Revenue",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "$ MM",
+      "derived": ["CumSum"],
+      "expressions": [
+        { "formula": "Max(${Rate}, 100) * ${Price}" }
+      ]
+    },
+    {
+      "metric_name": "Revenue Squared",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "derived": ["Total"],
+      "expressions": [
+        { "formula": "${Rate} * ${Rate}" }
+      ]
+    },
+    {
+      "metric_name": "Sales",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "$ MM",
+      "derived": ["Total"],
+      "expressions": [
+        { "formula": "${Rate} * ${Price} / 1000" }
+      ]
+    }
+  ]
+}

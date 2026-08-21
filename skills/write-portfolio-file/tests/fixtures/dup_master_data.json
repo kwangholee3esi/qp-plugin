@@ -1,0 +1,21 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "master_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Default Prices",
+        "outcomes": [
+          { "outcome_name": "Base", "metric_values": [
+            { "metric_name": "Oil Price", "values": [70, 72, 74], "unit": "$/bbl" } ] }
+        ]
+      },
+      {
+        "opportunity_name": "Default Prices",
+        "outcomes": [
+          { "outcome_name": "Base", "metric_values": [
+            { "metric_name": "Oil Price", "values": [80, 82, 84], "unit": "$/bbl" } ] }
+        ]
+      }
+    ]
+  }
+}

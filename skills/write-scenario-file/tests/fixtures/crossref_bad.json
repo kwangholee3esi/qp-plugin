@@ -1,0 +1,14 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": { "scenario_name": "Typo'd opportunity" },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)"
+  },
+  "opportunity_selections": [
+    {
+      "opportunity_name": "Ghost Well",
+      "selections": [ { "period": 0, "value": 1 } ]
+    }
+  ]
+}

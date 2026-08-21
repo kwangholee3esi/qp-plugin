@@ -1,0 +1,42 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": { "scenario_name": "Broken on purpose" },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)",
+    "objective_time_period": 0
+  },
+  "opportunity_selections": [
+    { "opportunity_name": "Alpha", "selections": [ { "period": 0, "value": 1 } ] },
+    { "opportunity_name": "Alpha", "selections": [] }
+  ],
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Alpha",
+        "total_minimum": 5,
+        "total_maximum": 1,
+        "time_period_minima": [3],
+        "time_period_maxima": [1]
+      }
+    ]
+  },
+  "selection_group": {
+    "groups": [
+      {
+        "group_name": "G1",
+        "type": "MutualInclusive",
+        "members": [ { "opportunity_name": "Alpha" } ]
+      }
+    ],
+    "group_limits": [
+      {
+        "group_name": "Nonexistent",
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": []
+      }
+    ]
+  }
+}

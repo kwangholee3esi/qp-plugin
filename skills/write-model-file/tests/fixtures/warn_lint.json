@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Rate",
+      "unit": "bbl/d"
+    },
+    {
+      "metric_name": "No Level",
+      "metric_type": "Computed",
+      "expressions": [
+        { "formula": "${Rate} * 1e5" }
+      ]
+    },
+    {
+      "metric_name": "Ignored GroupBy",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "group_by": ["Region"],
+      "expressions": [
+        { "formula": "${Rate} & 2" }
+      ]
+    },
+    {
+      "metric_name": "Filtered Scenario",
+      "metric_type": "Computed",
+      "level": "Scenario",
+      "expressions": [
+        {
+          "formula": "${Rate} * 2",
+          "criteria": [
+            { "attribute": "Regionn", "characteristic": ["West"] }
+          ]
+        }
+      ]
+    },
+    {
+      "metric_name": "Outcome Filtered Opp",
+      "metric_type": "Computed",
+      "level": "Opportunity",
+      "expressions": [
+        {
+          "order": 0,
+          "formula": "GetIRR(${Rate})"
+        },
+        {
+          "order": 0,
+          "formula": "GetAttributeValue(${Countryy})",
+          "criteria": [
+            { "outcome": ["Fail"] }
+          ]
+        }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "attribute_name": "Region",
+      "characteristics": [
+        { "characteristic_name": "West" }
+      ]
+    }
+  ]
+}

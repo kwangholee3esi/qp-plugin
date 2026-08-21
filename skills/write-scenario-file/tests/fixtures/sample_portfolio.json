@@ -1,0 +1,29 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "input_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Well A",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "metric_values": [
+              { "metric_name": "NPV ($ MM)", "values": [-10, 50, 60], "unit": "$ MM" }
+            ]
+          }
+        ]
+      },
+      {
+        "opportunity_name": "Well B",
+        "outcomes": [
+          {
+            "outcome_name": "Base",
+            "metric_values": [
+              { "metric_name": "NPV ($ MM)", "values": [-20, 40, 55], "unit": "$ MM" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

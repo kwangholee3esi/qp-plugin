@@ -1,0 +1,16 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": {
+    "scenario_name": "Schema-violating",
+    "color": "red",
+    "instance_selection_threshold": 0
+  },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)"
+  },
+  "metric_limits": [
+    { "metric_name": "Capex", "limit_type": "Maximum", "targets": [ { "period": 0, "value": 1 } ] },
+    { "metric_name": "Capex", "limit_type": "Maximum", "targets": [ { "period": 0, "value": 2 } ] }
+  ]
+}

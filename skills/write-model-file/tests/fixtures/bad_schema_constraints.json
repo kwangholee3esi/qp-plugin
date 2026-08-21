@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Cap{ex}",
+      "unit": "$ MM"
+    },
+    {
+      "metric_name": "Over Unit",
+      "unit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "metric_name": "Wrong Case Enum",
+      "metric_type": "computed"
+    },
+    {
+      "metric_name": "Bad Nested",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "group_by": [],
+      "expressions": [
+        { "order": -1, "formula": "1" }
+      ]
+    },
+    {
+      "metric_name": "Dup",
+      "unit": "$ MM"
+    },
+    {
+      "metric_name": "Dup",
+      "unit": "$ MM"
+    }
+  ]
+}

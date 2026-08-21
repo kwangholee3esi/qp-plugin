@@ -1,0 +1,134 @@
+{
+  "metadata": {
+    "qp_file_type": "QPortfolio Model",
+    "qp_version": 4.5
+  },
+  "metrics": [
+    {
+      "metric_name": "Oil Rate",
+      "metric_type": "Input",
+      "scalar": false,
+      "unit": "bbl/d",
+      "format": "#,##0.0",
+      "color": "#2CA02C",
+      "category": "Inputs",
+      "description": "Produced oil rate per period."
+    },
+    {
+      "metric_name": "Oil Price",
+      "metric_type": "MasterData",
+      "unit": "$/bbl",
+      "category": "Master Data"
+    },
+    {
+      "metric_name": "Working Interest",
+      "metric_type": "Input",
+      "scalar": true,
+      "unit": "fraction"
+    },
+    {
+      "metric_name": "Reserves",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "unit": "MMbbl",
+      "expressions": [
+        {
+          "formula": "${Reserves} - ${Oil Rate}",
+          "first_period_formula": "1000"
+        }
+      ]
+    },
+    {
+      "metric_name": "Revenue",
+      "metric_type": "Computed",
+      "level": "Outcome",
+      "scale_by": "Interest",
+      "unit": "$ MM",
+      "derived": [
+        "PT", "Disc", "Inf", "CumSum", "CumSumDisc", "CumSumInf",
+        "Total", "TotalDisc", "TotalInf", "MaxAT"
+      ],
+      "expressions": [
+        {
+          "order": 0,
+          "formula": "${Oil Rate} * ${Oil Price} / 1000"
+        },
+        {
+          "order": 1,
+          "formula": "${Oil Rate} * ${Oil Price} * 0.9 / 1000",
+          "criteria": [
+            {
+              "attribute": "Country",
+              "characteristic": ["USA"],
+              "except_attribute": false,
+              "opportunity": ["Well A"],
+              "except_opportunity": false,
+              "outcome": ["Fail"],
+              "except_outcome": true,
+              "period": [0, 1],
+              "except_period": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "metric_name": "Net Cashflow",
+      "metric_type": "Computed",
+      "level": "Opportunity",
+      "scale_by": "Instance",
+      "hidden": false,
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "${Revenue} - ${Oil Rate}" }
+      ]
+    },
+    {
+      "metric_name": "Country Cashflow",
+      "metric_type": "Computed",
+      "level": "Group",
+      "group_by": ["Country"],
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "Total(${Revenue})" }
+      ]
+    },
+    {
+      "metric_name": "Scenario Tax",
+      "metric_type": "Computed",
+      "level": "Scenario",
+      "hidden": true,
+      "unit": "$ MM",
+      "expressions": [
+        { "formula": "GetCumulative(${Revenue}, 0, GetCurrentTime()) * 0.3" }
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "attribute_name": "Country",
+      "data_type": "String",
+      "scenario_level": false,
+      "editable": true,
+      "characteristics": [
+        { "characteristic_name": "Canada", "sort_order": 1, "color": "#1F77B4" },
+        { "characteristic_name": "USA", "sort_order": 2, "color": "#FF7F0E" }
+      ]
+    },
+    {
+      "attribute_name": "Royalty Tier",
+      "data_type": "Numeric",
+      "characteristics": [
+        { "characteristic_name": "0.05" }
+      ]
+    },
+    {
+      "attribute_name": "Start Date",
+      "data_type": "Date",
+      "scenario_level": true,
+      "characteristics": [
+        { "characteristic_name": "2027-01-01" }
+      ]
+    }
+  ]
+}

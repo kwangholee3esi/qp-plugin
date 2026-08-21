@@ -1,0 +1,50 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "input_data": {
+    "opportunity_outcomes": [
+      {
+        "opportunity_name": "Exploration X",
+        "outcomes": [
+          { "outcome_name": "P90", "weight": 0.2, "metric_values": [
+            { "metric_name": "Net cash flow", "values": [-50, -10, 20, 30, 30], "unit": "$ MM" } ] },
+          { "outcome_name": "P50", "weight": 0.5, "metric_values": [
+            { "metric_name": "Net cash flow", "values": [-50, 40, 80, 90, 90], "unit": "$ MM" } ] },
+          { "outcome_name": "P10", "weight": 0.3, "metric_values": [
+            { "metric_name": "Net cash flow", "values": [-50, 120, 200, 210, 210], "unit": "$ MM" } ] }
+        ]
+      },
+      { "opportunity_name": "Dev Y", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Net cash flow", "values": [-30, 25, 40, 40, 40], "unit": "$ MM" } ] } ] },
+      { "opportunity_name": "Dev Z", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Net cash flow", "values": [-20, 15, 25, 25, 25], "unit": "$ MM" } ] } ] }
+    ]
+  },
+  "outcome_dependency": {
+    "dependencies": [
+      {
+        "independent_opportunity": "Exploration X",
+        "dependent_opportunity": "Dev Y",
+        "target_cases": [
+          { "independent_outcomes": ["P90"], "outcome_weights": [
+            { "dependent_outcomes": ["Base"], "weight": 1 } ] },
+          { "independent_outcomes": ["*"], "outcome_weights": [
+            { "dependent_outcomes": ["Base"], "weight": 1 } ] }
+        ]
+      }
+    ]
+  },
+  "selection_constraints": {
+    "opportunity_limits": [
+      {
+        "opportunity_name": "Exploration X",
+        "integer_only": false,
+        "total_minimum": 0,
+        "total_maximum": 1,
+        "time_period_minima": [],
+        "time_period_maxima": [1, 1, 1, 1, 1]
+      }
+    ]
+  }
+}

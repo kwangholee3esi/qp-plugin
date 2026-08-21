@@ -1,0 +1,24 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Data", "qp_version": 4.5 },
+  "input_data": {
+    "opportunity_outcomes": [
+      { "opportunity_name": "Wildcat Ridge", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Net cash flow", "values": [-120, 60, 90], "unit": "$ MM" } ] } ] },
+      { "opportunity_name": "Eastfield Infill", "outcomes": [
+        { "outcome_name": "Base", "weight": 1, "metric_values": [
+          { "metric_name": "Net cash flow", "values": [-40, 25, 35], "unit": "$ MM" } ] } ] }
+    ]
+  },
+  "selection_dependency": {
+    "dependencies": [
+      {
+        "dependent_opportunity": "Eastfield Infill",
+        "independent_opportunity": "Wildcat Ridge",
+        "type": "Must",
+        "timing": "OverAll",
+        "timing_offset": 0
+      }
+    ]
+  }
+}

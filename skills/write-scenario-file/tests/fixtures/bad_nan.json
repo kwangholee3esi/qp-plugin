@@ -1,0 +1,15 @@
+{
+  "metadata": { "qp_file_type": "QPortfolio Scenario Data", "qp_version": 4.5 },
+  "settings": { "scenario_name": "NaN case" },
+  "optimization": {
+    "direction": "Maximize",
+    "objective_metric_name": "NPV ($ MM)"
+  },
+  "metric_limits": [
+    {
+      "metric_name": "Capex-Drilling",
+      "limit_type": "Maximum",
+      "targets": [ { "period": 0, "value": NaN } ]
+    }
+  ]
+}
