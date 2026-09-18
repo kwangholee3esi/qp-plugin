@@ -1,0 +1,467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.quorumsoftware.com/qportfolio/model.schema.json",
+  "title": "QPortfolio Model",
+  "description": "Root document for a QPortfolio model file (qp_file_type = \u0022QPortfolio Model\u0022). A model is the definitional layer of a portfolio: its metrics (computed by expressions) and its attribute definitions. It is distinct from the data the model runs on \u2014 a portfolio has exactly one model, and it is not versioned. Metric and attribute names are the join key: a name used here must match the name used in the portfolio\u0027s data file exactly. The two sections are independent: a file may carry metrics, attributes, or both, and an omitted section leaves that part of the model untouched on import. Because they are independent, one model may also be SPLIT across several files imported together \u2014 typically one carrying the metrics and another the attributes. Each section may be carried by at most one file of an import: if two files both carry metrics, or both carry attributes, the import is rejected rather than one silently winning. References may cross files \u2014 a metric here may group by or filter on an attribute defined in the other file of the same import.",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "description": "Document header. For a model file qp_file_type must be \u0022QPortfolio Model\u0022.",
+      "type": "object",
+      "properties": {
+        "qp_file_type": {
+          "description": "Discriminator for the document type. Use \u0022QPortfolio Data\u0022 for a portfolio-definition file (PortfolioData), \u0022QPortfolio Scenario Data\u0022 for a scenario file (ScenarioData) and \u0022QPortfolio Model\u0022 for a model file (ModelData). Required.",
+          "type": "string"
+        },
+        "qp_version": {
+          "description": "QPortfolio schema/format version this file targets, e.g. 4.5. Optional; when omitted the importer assumes the current version.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "examples": [
+            4.5
+          ]
+        }
+      },
+      "required": [
+        "qp_file_type"
+      ],
+      "additionalProperties": false
+    },
+    "metrics": {
+      "description": "The metrics of the model \u2014 the variables it reads or computes. Input and master-data metrics carry no expression; computed metrics carry one or more expressions. metric_name must be unique across the file. Omit this property entirely for an attributes-only file: the model\u0027s existing metrics are then left untouched. An EMPTY list is not the same thing \u2014 it is a list of metrics that happens to name none, so every computed metric of the model becomes obsolete and is deleted.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "description": "A metric: a variable in the model. Input and master-data metrics are imported values (no expression); computed metrics are calculated from other metrics via one or more expressions. This file is the complete definition of the metrics it lists: on re-import, an omitted optional property (unit, color, format, category, description, master-data flag) CLEARS any existing value rather than preserving it, so state every property you want kept. (A partial Excel expression sheet behaves differently - a missing COLUMN there preserves the existing value, because a sheet cannot express the field at all.)",
+        "type": "object",
+        "properties": {
+          "metric_name": {
+            "description": "Unique case-insensitive name of the metric, e.g. \u0022Capex-Drilling\u0022. Must match the name used for this metric in the portfolio data file. Braces { } are not allowed (they delimit references inside expression formulas). Names ending in \u0022#\u003CType\u003E\u0022 for a derivation type (see derived) are reserved for derived metrics, unconditionally and whatever the metric\u0027s type: a metric named \u0022Revenue#CumSum\u0022 is rejected at import \u2014 list the derivation type under the origin metric\u0027s derived instead.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 450,
+            "pattern": "^[^{}]\u002B$"
+          },
+          "metric_type": {
+            "description": "The type of metric (input, master data, or computed). Optional; defaults to Input. A metric with expressions must be Computed. When re-importing into a model that already defines this metric, its type cannot switch between input and computed (rejected at import). Allowed values: \u0060Input\u0060 \u2014 An input metric whose values are imported per opportunity.; \u0060MasterData\u0060 \u2014 A master-data metric: a value that applies across all opportunities (e.g. a price deck, FX, inflation) and is matched to each via attributes.; \u0060Computed\u0060 \u2014 A computed metric, calculated from other metrics by its expressions..",
+            "enum": [
+              "Input",
+              "MasterData",
+              "Computed"
+            ]
+          },
+          "scalar": {
+            "description": "When true this metric is a scalar: a single value rather than the default per-period time series. (Shown as an \u0022indicator\u0022 on the Model page.) Optional; defaults to false.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "hidden": {
+            "description": "When true this metric is hidden \u2014 an interim sub-metric produced when a compound expression is broken into intermediate parts. Hidden metrics are part of the model but not shown on the Model page by default. Optional; defaults to false. A metric already imported as visible cannot be switched to hidden on a later import (rejected at import).",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "level": {
+            "description": "The calculation level of a computed metric. Allowed values: \u0060Outcome\u0060 \u2014 Calculated per opportunity-outcome pair (the lowest level); outcome weights then produce the expected value. Any filter may apply.; \u0060Scenario\u0060 \u2014 Calculated for the whole scenario with inputs aggregated across all opportunities (e.g. a graduated tax). Cannot be filtered. The default when a computed metric specifies no level.; \u0060Group\u0060 \u2014 Calculated per group of opportunities aggregated by an attribute (see group_by) for ring-fenced, entity-by-entity calculations.; \u0060Opportunity\u0060 \u2014 Calculated from each opportunity\u0027s expected values; usually matches Outcome with faster run time. All filters except by-outcome apply..",
+            "enum": [
+              "Outcome",
+              "Scenario",
+              "Group",
+              "Opportunity"
+            ]
+          },
+          "group_by": {
+            "description": "For a Group-level metric, the attribute name(s) whose values define the groups, e.g. [\u0022Country\u0022] or [\u0022Country\u0022, \u0022Region\u0022] for multi-level grouping. Optional; used only when level is Group.",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "scale_by": {
+            "description": "How the metric value is scaled for a selection of an opportunity. Optional; defaults to Interest. Allowed values: \u0060Interest\u0060 \u2014 Scaled by the fractional selected interest (the default).; \u0060Instance\u0060 \u2014 Scaled by the number of selected instances..",
+            "enum": [
+              "Interest",
+              "Instance"
+            ]
+          },
+          "expressions": {
+            "description": "The expressions that compute this metric, in Excel-style formula syntax. Present only for computed metrics. Multiple expressions match and apply in order, each optionally restricted by criteria (filtering by exception: the first is the default, later ones are exceptions).",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "description": "One expression that computes a metric. The formula is written in Excel-style syntax; references to other metrics and attributes are wrapped in ${...}, e.g. \u0022${Opex - Fixed} \u002B ${Opex - Variable}\u0022 or \u0022GetCumulative(${Revenue}, 0, 4)\u0022. Special functions (GetDiscounted, GetInflated, GetCumulative, GetMetricValue, GetAttributeValue, \u2026), operators and numeric constants are written bare. Macro functions (e.g. FlagUpToMax) are not supported in JSON model files (rejected at import).",
+              "type": "object",
+              "properties": {
+                "order": {
+                  "description": "Evaluation order of this expression among the metric\u0027s expressions (lower first). Used for filtering by exception. Optional; defaults to 0.",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "criteria": {
+                  "description": "Filters restricting which opportunities, outcomes, groups or periods this expression applies to. Omit or leave empty for an unfiltered (default) expression. Multiple criteria combine as OR.",
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "description": "A single filter on an expression. Any combination of attribute/characteristic, opportunity, outcome and time period may be set; each condition accepts one or more values (the expression applies when the outcome matches any of them), and each may be negated with its corresponding except_* flag (apply everywhere except the named values).",
+                    "type": "object",
+                    "properties": {
+                      "attribute": {
+                        "description": "Attribute name to filter by (use together with characteristic). Optional; omit it rather than writing an empty name.",
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "minLength": 1,
+                        "maxLength": 450,
+                        "pattern": "^[^{}]\u002B$"
+                      },
+                      "characteristic": {
+                        "description": "Characteristic values of the attribute to filter by. Optional.",
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 1
+                      },
+                      "opportunity": {
+                        "description": "Opportunity names to filter by. Optional.",
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 1
+                      },
+                      "outcome": {
+                        "description": "Outcome names to filter by, e.g. \u0022Fail\u0022. Optional.",
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 1
+                      },
+                      "period": {
+                        "description": "Time periods (0-based) this expression applies to. Optional.",
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 1
+                      },
+                      "except_attribute": {
+                        "description": "When true the attribute/characteristic filter is negated (apply except to the named characteristics). Optional; defaults to false.",
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "except_opportunity": {
+                        "description": "When true the opportunity filter is negated. Optional; defaults to false.",
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "except_outcome": {
+                        "description": "When true the outcome filter is negated. Optional; defaults to false.",
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "except_period": {
+                        "description": "When true the time period filter is negated. Optional; defaults to false.",
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "formula": {
+                  "description": "The formula evaluated for each time period. Every metric/attribute reference is wrapped in ${...} (the name inside must match a defined metric/attribute exactly). References are resolved, and the formula\u0027s syntax, functions and argument counts are validated, when the file is imported (cross-metric checks the schema itself cannot express).",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "first_period_formula": {
+                  "description": "Optional formula that seeds the first time period only (e.g. an opening balance); formula governs subsequent periods. Omit when the first period uses the same formula - do not write an empty string.",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "formula"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "unit": {
+            "description": "Unit label for the metric, e.g. \u0022$ MM\u0022, \u0022bbl/d\u0022. QPortfolio only labels and verifies unit consistency; it does not convert units. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "format": {
+            "description": "Numeric display format for the metric on dashboard widgets. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "color": {
+            "description": "Display colour for the metric on dashboard widgets, as a hex string, e.g. \u0022#1F77B4\u0022. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "maxLength": 32
+          },
+          "category": {
+            "description": "Optional category the metric is grouped under on the Model page.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 255
+          },
+          "description": {
+            "description": "Free-text description of the metric. Optional.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
+          },
+          "derived": {
+            "description": "The derived metrics to become usable from this metric \u2014 auto-created transforms of it (discounted, running cumulative, total, max-all-time, \u2026), e.g. [\u0022CumSum\u0022, \u0022Disc\u0022]. Each type produces one metric named \u0022\u003Cthis metric\u0027s name\u003E#\u003CType\u003E\u0022 (e.g. \u0022Revenue#CumSum\u0022) that expressions and dashboards can reference by that name. A derived metric carries no expression and no properties of its own: the type defines its value and everything else (unit, level, group_by, scale_by, scalar, hidden) follows this metric. Any ordinary metric may have derived metrics, but a derived metric cannot itself have them. A type referenced by a formula (\u0022${Revenue#CumSum}\u0022) is generated even if it is not listed here. On re-import this list is additive: the listed types merge with the derived metrics that already exist, a type no longer listed keeps its derived metric (remove it on the Model page instead; it is deleted with its origin metric). A formula may only reference \u0022${origin#Type}\u0022 when this file also defines that origin metric. Omit when there are none.",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "description": "A derivation type: the transform applied to an origin metric to produce a derived metric. Discounting and inflation use the portfolio\u0027s rates. Allowed values: \u0060PT\u0060 \u2014 Previous Time: the origin\u0027s value one time period earlier.; \u0060Disc\u0060 \u2014 Discounted: the origin\u0027s per-period value discounted to the start.; \u0060Inf\u0060 \u2014 Inflated: the origin\u0027s per-period value with inflation applied.; \u0060CumSum\u0060 \u2014 Running Cumulative: the origin summed from the first period up to each period.; \u0060CumSumDisc\u0060 \u2014 Running Cumulative Discounted: like CumSum, over discounted values.; \u0060CumSumInf\u0060 \u2014 Running Cumulative Inflated: like CumSum, over inflated values.; \u0060Total\u0060 \u2014 Total: the origin summed over all time periods \u2014 a scalar.; \u0060TotalDisc\u0060 \u2014 Total Discounted: the discounted origin summed over all time periods \u2014 a scalar.; \u0060TotalInf\u0060 \u2014 Total Inflated: the inflated origin summed over all time periods \u2014 a scalar.; \u0060MaxAT\u0060 \u2014 Max All Time: the origin\u0027s largest value across all time periods \u2014 a scalar..",
+              "enum": [
+                "PT",
+                "Disc",
+                "Inf",
+                "CumSum",
+                "CumSumDisc",
+                "CumSumInf",
+                "Total",
+                "TotalDisc",
+                "TotalInf",
+                "MaxAT"
+              ]
+            }
+          }
+        },
+        "required": [
+          "metric_name"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueKeys": [
+        "/metric_name"
+      ]
+    },
+    "attributes": {
+      "description": "Attribute definitions and their allowed characteristics (data type, scenario-level, editability, and each characteristic\u0027s display order and colour). The per-opportunity characteristic values live in the portfolio data file; the two are joined by attribute/characteristic name. Omit this property entirely for a metrics-only file; the model\u0027s existing attributes are then left untouched. Attributes are never deleted by an import, so an empty list has the same effect as omitting it.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "description": "An attribute definition: a grouping category (e.g. Country, Project Type) together with its data type and its allowed characteristics.",
+        "type": "object",
+        "properties": {
+          "attribute_name": {
+            "description": "Unique name of the attribute, e.g. \u0022Country\u0022. Must match the name used in the portfolio data file. Braces { } are not allowed (they delimit references inside expression formulas).",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 450,
+            "pattern": "^[^{}]\u002B$"
+          },
+          "data_type": {
+            "description": "Data type of the attribute\u0027s characteristics. Optional; defaults to String. Allowed values: \u0060String\u0060 \u2014 Text characteristics, e.g. Country = Canada.; \u0060Numeric\u0060 \u2014 Numeric characteristics.; \u0060Date\u0060 \u2014 Date characteristics..",
+            "enum": [
+              "String",
+              "Numeric",
+              "Date"
+            ]
+          },
+          "scenario_level": {
+            "description": "When true the attribute\u0027s characteristic can be selected at scenario level (e.g. a price set) for sensitivity analysis. Optional; defaults to false.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "editable": {
+            "description": "When true the attribute\u0027s characteristics may be edited on the Opportunities page. Optional; defaults to false.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "characteristics": {
+            "description": "The known characteristic values for this attribute, with their display order and colour.",
+            "type": "array",
+            "items": {
+              "description": "A characteristic definition: one known value of an attribute, with its display ordering and colour (used when charts render this characteristic).",
+              "type": "object",
+              "properties": {
+                "characteristic_name": {
+                  "description": "The characteristic value, e.g. \u0022Canada\u0022.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 450
+                },
+                "sort_order": {
+                  "description": "Sort order of this characteristic within its attribute (lower first). Optional.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "color": {
+                  "description": "Display colour for this characteristic on charts, as a hex string, e.g. \u0022#1F77B4\u0022. Optional.",
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^#[0-9A-Fa-f]{6}$",
+                  "maxLength": 32
+                }
+              },
+              "required": [
+                "characteristic_name"
+              ],
+              "additionalProperties": false
+            },
+            "uniqueKeys": [
+              "/characteristic_name"
+            ]
+          }
+        },
+        "required": [
+          "attribute_name"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueKeys": [
+        "/attribute_name"
+      ]
+    }
+  },
+  "required": [
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "metadata": {
+        "qp_file_type": "QPortfolio Model",
+        "qp_version": 4.5
+      },
+      "metrics": [
+        {
+          "metric_name": "Oil Rate",
+          "unit": "bbl/d"
+        },
+        {
+          "metric_name": "Oil Price",
+          "metric_type": "MasterData",
+          "unit": "$/bbl"
+        },
+        {
+          "metric_name": "Daily Production",
+          "metric_type": "Computed",
+          "level": "Outcome",
+          "unit": "bbl/d",
+          "expressions": [
+            {
+              "formula": "${Oil Rate} / 365"
+            }
+          ]
+        },
+        {
+          "metric_name": "Revenue",
+          "metric_type": "Computed",
+          "level": "Outcome",
+          "unit": "$ MM",
+          "derived": [
+            "CumSum"
+          ],
+          "expressions": [
+            {
+              "formula": "${Oil Rate} * ${Oil Price} / 1000",
+              "criteria": [
+                {
+                  "attribute": "Country",
+                  "characteristic": [
+                    "Canada"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "attributes": [
+        {
+          "attribute_name": "Country",
+          "data_type": "String",
+          "editable": true,
+          "characteristics": [
+            {
+              "characteristic_name": "Canada",
+              "sort_order": 1,
+              "color": "#1F77B4"
+            },
+            {
+              "characteristic_name": "USA",
+              "sort_order": 2,
+              "color": "#FF7F0E"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
