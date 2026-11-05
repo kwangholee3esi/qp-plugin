@@ -1,0 +1,19 @@
+{
+  "name": "qp-author",
+  "description": "Author and validate QPortfolio portfolio, scenario and model Portable-JSON files from plain-language descriptions, and work with a live Q Portfolio installation — load files in, run optimizations, read results. Grounded in the QP domain vault.",
+  "author": { "name": "Quorum Portfolio" },
+  "repository": "https://github.com/kwangholee3esi/qp-plugin",
+  "userConfig": {
+    "qp_url": {
+      "type": "string",
+      "title": "Q Portfolio MCP address",
+      "description": "The MCP address your administrator gave you, e.g. https://portfolio-mcp.example.com, with no slash at the end (not the Portfolio web page you log in to). It also serves the Portfolio knowledge base. Leave empty to only build files offline."
+    },
+    "qp_api_key": {
+      "type": "string",
+      "title": "Q Portfolio API key",
+      "description": "In Portfolio, open Account Settings and create an MCP API key (starts with qpk_). Stored in your system's secure credential store.",
+      "sensitive": true
+    }
+  }
+}

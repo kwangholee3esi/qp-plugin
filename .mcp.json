@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "qpwiki": { "type": "http", "url": "${user_config.qp_url}/wiki" },
+    "qpmcp": {
+      "type": "http",
+      "url": "${user_config.qp_url}",
+      "headers": { "Authorization": "Bearer ${user_config.qp_api_key}" }
+    }
+  }
+}
