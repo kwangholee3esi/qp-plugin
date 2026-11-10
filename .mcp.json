@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "qpwiki": { "type": "http", "url": "https://vm-pf-demo-001.planningspace.io/qpdev-mcp/wiki" },
+    "qpmcp": {
+      "type": "http",
+      "url": "https://vm-pf-demo-001.planningspace.io/qpdev-mcp/",
+      "oauth": { "clientId": "cp-portfolio", "callbackPort": 8765 }
+    }
+  }
+}
